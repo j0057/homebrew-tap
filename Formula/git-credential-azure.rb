@@ -12,6 +12,6 @@ class GitCredentialAzure < Formula
   end
 
   test do
-    assert_match "git-credential-oauth #{version}", shell_output("#{bin}/git-credential-oauth -verbose 2>&1", 2)
+    assert_match "git-credential-azure #{version}", shell_output("#{bin}/git-credential-azure -verbose 2>&1", 2)
   end
 end
