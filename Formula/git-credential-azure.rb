@@ -6,10 +6,12 @@ class GitCredentialAzure < Formula
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
     root_url "https://ghcr.io/v2/j0057/tap"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:  "4f9d4d2baf0eb6a7452a69db5b5affc137f499268c2cf7dbef0a59f53bcaf92b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux: "8cf3566bd22ec6a6943e7f632b69da546db07c7579ec33ce34561772d9717a53"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:   "19045d3046532b9783df98689ec6d12aa8951337b7ccbcc81a81c931b56c3c0b"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia: "e51ea4e163562a3e1ce0d3c8073940d841099d01eee4d44d286436c2f0521368"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:  "66a257d25a0573834316cb81113f354c5f964abe2abac1936b6a36d0f34e42a5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fe197b35186745d5c19e4a5abcac93062afe08bbf211541f87095a2cc1eab6bf"
   end
 
   depends_on "go" => :build
