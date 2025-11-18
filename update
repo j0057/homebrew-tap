@@ -1,0 +1,90 @@
+#!/bin/bash
+
+trap 'echo $LINENO: $BASH_COMMAND' ERR
+
+nvchecker -c nvchecker.toml -l warning -t 3 \
+    || exit 1
+
+nvcmp -c nvchecker.toml | while read pkg oldver op newver; do
+    test "$op" = '->' \
+        || continue
+
+    # is it a Formula or a Cask?
+    path=$(compgen -G "Formula/$pkg.rb" || compgen -G "Casks/$pkg.rb") \
+        || { echo "[$pkg] ERROR: $pkg.rb not found" >&2 ; continue ; }
+
+    # create detached head based on github/main
+    git fetch github \
+        && git -c 'advice.detachedHead=false' checkout $(git rev-parse nvchecker) \
+        || continue
+    # FIXME: this should be github/main instead of nvchecker when going live
+
+    echo "[$pkg] updating from $oldver to $newver in $path"
+
+    # update url in formula or version in cask
+    case $path in
+        Formula/*)
+            gsed -i $path -e "/^  url / s/$oldver/$newver/" \
+                && url=$(gawk '$1=="url" {print $2}' $path | gsed 's/"//g') \
+                && sha256=$(curl -sL $url | sha256sum - | gawk '{print $1}') \
+                && gsed -i $path -e "/^  sha256 / s/\".*\"/\"$sha256\"/" \
+                && gsed -i $path -e "/^    rebuild /d" \
+                || continue
+                ;;
+        Casks/*)
+            gsed -i $path -e "/^  version / s/$oldver/$newver/" \
+                && url=$(gawk '$1=="url" {print $2}' $path | gsed -e 's/"//g' -e "s/#{version}/$newver/") \
+                && sha256=$(curl -sL $url | sha256sum - | gawk '{print $1}') \
+                && gsed -i $path -e "/^  sha256 / s/\".*\"/\"$sha256\"/" \
+                || continue
+                ;;
+    esac
+
+    # create Git commit and push
+    git add $path \
+        && git commit -m "$pkg: update to $newver" \
+        && git push github @:refs/heads/$pkg-$newver \
+        || continue
+
+    # create PR and save URL
+    pr_url=$(gh pr create -H $pkg-$newver -B main -t "Update $pkg to $newver" -b "Update $pkg to $newver") \
+        || continue
+    echo "[$pkg] pull request created at $pr_url"
+
+    # wait for brew test-bot workflow to finish
+    while gh pr checks $pr_url --json workflow,state \
+          | jq -e '[.[] | select(.workflow == "brew test-bot") | .state] | isempty(.[]) or any(. == "WAITING" or . == "PENDING" or . == "QUEUED" or . == "IN_PROGRESS")'; do
+        sleep 2.5
+    done
+
+    echo "[$pkg] waiting for workflow to complete: brew test-bot"
+    gh pr checks $pr_url --json workflow,state | jq -e '[.[] | select(.workflow == "brew test-bot") | .state] | all(. == "SUCCESS")' \
+        || { echo "[$pkg] brew test-bot workflow failed" \
+           ; continue \
+           ; }
+
+    # set pr-pull label
+    gh pr edit $pr_url --add-label 'pr-pull' \
+        || continue
+
+    echo "[$pkg] waiting for workflow to complete: brew pr-pull"
+    while gh pr checks $pr_url --json workflow,state \
+          | jq -e '[.[] | select(.workflow == "brew pr-pull") | .state] | isempty(.[]) or any(. == "WAITING" or . == "PENDING" or . == "QUEUED" or . == "IN_PROGRESS")'; do
+        sleep 2.5
+    done
+
+    # get updated code
+    git fetch github
+
+    # update current version
+    nvtake -c nvchecker.toml $pkg \
+        || continue
+
+    # finally! we're done
+    echo "[$pkg] success!"
+done
+
+# get back to normal
+#git fetch github
+#git checkout main
+#git merge --no-ff github/main
