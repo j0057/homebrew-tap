@@ -12,7 +12,6 @@ cask "artifacts-credprovider" do
     stable_path = "#{HOMEBREW_PREFIX}/opt/artifacts-credprovider"
     FileUtils.rm_f stable_path
     FileUtils.ln_s staged_path, stable_path
-
     plugin_path = "#{Dir.home}/.nuget/plugins/netcore"
     FileUtils.mkdir_p plugin_path
     FileUtils.rm_f "#{plugin_path}/CredentialProvider.Microsoft"
