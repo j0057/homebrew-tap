@@ -1,0 +1,15 @@
+[__config__]
+oldver = "nvchecker-old.json"
+newver = "nvchecker-new.json"
+
+[git-credential-azure]
+source = "github"
+github = "hickford/git-credential-azure"
+use_latest_release = true
+prefix = "v"
+
+[artifacts-credprovider]
+source = "github"
+github = "microsoft/artifacts-credprovider"
+use_latest_release = true
+prefix = "v"
