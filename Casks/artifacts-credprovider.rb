@@ -10,16 +10,14 @@ cask "artifacts-credprovider" do
 
   postflight do
     stable_path = "#{HOMEBREW_PREFIX}/opt/artifacts-credprovider"
-    FileUtils.rm_f stable_path
-    FileUtils.ln_s staged_path, stable_path
     plugin_path = "#{Dir.home}/.nuget/plugins/netcore"
     FileUtils.mkdir_p plugin_path
-    FileUtils.rm_f "#{plugin_path}/CredentialProvider.Microsoft"
-    FileUtils.ln_s "#{stable_path}/plugins/netcore/CredentialProvider.Microsoft", "#{plugin_path}/CredentialProvider.Microsoft"
+    FileUtils.ln_sf staged_path, stable_path
+    FileUtils.ln_sf "#{stable_path}/plugins/netcore/CredentialProvider.Microsoft", "#{plugin_path}/CredentialProvider.Microsoft"
   end
 
   uninstall_postflight do
-    FileUtils.rm_f "#{HOMEBREW_PREFIX}/opt/artifacts-credprovider"
-    FileUtils.rm_f "#{Dir.home}/.nuget/plugins/netcore/CredentialProvider.Microsoft"
+    FileUtils.rm "#{HOMEBREW_PREFIX}/opt/artifacts-credprovider"
+    FileUtils.rm "#{Dir.home}/.nuget/plugins/netcore/CredentialProvider.Microsoft"
   end
 end
