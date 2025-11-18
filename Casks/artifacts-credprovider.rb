@@ -12,7 +12,8 @@ cask "artifacts-credprovider" do
     plugin_path = "#{Dir.home}/.nuget/plugins/netcore"
     FileUtils.mkdir_p plugin_path
     FileUtils.ln_sf staged_path, stable_path
-    FileUtils.ln_sf "#{stable_path}/plugins/netcore/CredentialProvider.Microsoft", "#{plugin_path}/CredentialProvider.Microsoft"
+    FileUtils.ln_sf "#{stable_path}/plugins/netcore/CredentialProvider.Microsoft",
+                    "#{plugin_path}/CredentialProvider.Microsoft"
   end
 
   uninstall_postflight do
