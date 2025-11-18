@@ -1,4 +1,4 @@
-# J0057 Tap
+# j0057 tap
 
 ## How do I install these formulae?
 
@@ -16,12 +16,3 @@ brew "<formula>"
 ## Documentation
 
 `brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).
-
-## Howto update bottle hashes
-
-This outputs a snippet for inclusion into the recipe or whatever it's called:
-
-```
-brew install --build-bottle j0057/tap/...
-brew bottle j0057/tap/...
-```
