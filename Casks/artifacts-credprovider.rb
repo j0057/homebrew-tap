@@ -1,7 +1,7 @@
 cask "artifacts-credprovider" do
   sha256 "19c057826d47d1327cb1fec38c0b9ad15ed6c00ee5113aae0993c7f22a2d877d"
 
-  url "https://github.com/microsoft/artifacts-credprovider/releases/download/v1.4.1/Microsoft.Net8.osx-arm64.NuGet.CredentialProvider.zip"
+  url "https://github.com/microsoft/artifacts-credprovider/releases/download/v1.4.0/Microsoft.Net8.osx-arm64.NuGet.CredentialProvider.zip"
   name "artifacts-credprovider"
   desc "Interactively acquire credentials for Azure Artifacts feeds"
   homepage "https://github.com/microsoft/artifacts-credprovider"
