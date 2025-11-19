@@ -8,6 +8,7 @@ on:
 
 jobs:
   test-bot:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     strategy:
       matrix:
         os:
@@ -62,3 +63,15 @@ jobs:
         with:
           name: bottles_${{ matrix.os }}
           path: '*.bottle.*'
+
+  set-pr-label:
+    needs: test-bot
+    if: success() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Set pr-pull label
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --add-label pr-pull
